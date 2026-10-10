@@ -4,8 +4,8 @@
 
 *English summary is at the bottom.*
 
-> **先に知っておくこと: 規則ノートを vault に置かないと、何も検査しません。**
-> 検査の中身(対象のフォルダ・見出しの一覧・番号の形)は、全部そのノートの json のブロック 1 つから読みます。プラグインは規則ノートを作りませんし、書き換えません。形は下の「規則ノート」にあります。
+> **先に知っておくこと: 規則ノートを vault に置き、その場所を設定の「規則ノートのパス」に入れるまで、何も検査しません。**
+> 検査の中身(対象のフォルダ・見出しの一覧・番号の形)は、全部そのノートの json のブロック 1 つから読みます。プラグインは規則ノートを作りませんし、書き換えません。形は下の「規則ノート」にあります。「規則ノートのパス」は、入れた直後は空(未設定)です。
 
 ## できること
 - **形の検査**: H1 の形、あるべき節(H2)の有無・順番・重複・文言、節の中の小見出し、決まった言い回しや欄があるか
@@ -51,7 +51,7 @@
 
 ### 規則ノート
 
-vault のどこかに md を 1 本作り、中に json のブロックを **ちょうど 1 つ** 書きます(0 個や 2 個以上だと検査しません)。ブロックの外の文は読まれないので、説明を自由に書けます。置いた場所を、設定の「規則ノートのパス」に入れます(既定のパスは作者の vault の物です)。
+vault のどこかに md を 1 本作り、中に json のブロックを **ちょうど 1 つ** 書きます(0 個や 2 個以上だと検査しません)。ブロックの外の文は読まれないので、説明を自由に書けます。置いた場所を、設定の「規則ノートのパス」に入れます(例: `Docs/SpecLint rules.md`。入れた直後は空で、入れるまでは規則ノートを探しません)。
 
 ````markdown
 # 仕様書の検査の規則
@@ -117,6 +117,13 @@ vault のどこかに md を 1 本作り、中に json のブロックを **ち�
 ### 手で入れる
 [Releases](https://github.com/takosasi-dev/spec-lint/releases) から `main.js`・`manifest.json`・`styles.css` を落とし、vault の `.obsidian/plugins/spec-lint/` に置いて、コミュニティプラグインの一覧で有効にします。
 
+### 入れたら最初に設定する
+
+1. 上の「規則ノート」の形の md を、自分の vault に 1 本作る。
+2. 設定 → Spec Lint の「規則ノートのパス」に、その md の vault からのパスを入れる(例: `Docs/SpecLint rules.md`)。
+
+入れるまでは、パネルに `規則ノートのパスが未設定。設定 → Spec Lint の「規則ノートのパス」で指定する` と出るだけで、規則ノートを探さず、検査を 1 つもしません。
+
 ## 使い方
 
 規則ノートを置いて設定にパスを入れたら、対象フォルダの仕様書を開きます。自動で検査されるので、コマンドでパネルを開いて結果を見ます。仕様書を直して保存すると、検査し直します。
@@ -125,7 +132,7 @@ vault のどこかに md を 1 本作り、中に json のブロックを **ち�
 | コマンドパレットに出る名前 | すること |
 |---|---|
 | Spec Lint: 仕様書の検査パネルを開く | 右サイドバーにパネル「仕様書の検査」を出す |
-| Spec Lint: 開いている仕様書を検査し直す | 今開いている仕様書を検査する。自動検査を切っていても動く |
+| Spec Lint: 開いている仕様書を検査し直す | 今開いている仕様書を検査する。自動検査を切っていても動く。「規則ノートのパス」が未設定のときは、検査せずにパネルを開いて、設定する項目を知らせる |
 
 既定のホットキーはありません。
 
@@ -143,12 +150,12 @@ vault のどこかに md を 1 本作り、中に json のブロックを **ち�
 - 「除いた参照」は、その仕様書に定義の無い番号のうち、同じ行に対象フォルダの下のフォルダ名(ほかの文書の名前)がある物です。ほかの文書の番号を指していると見て、注意から外します
 - 「節が無い」「名前の行が無い」は行を持たないので、押せません
 
-検査をしなかったときは、理由が出ます: `対象外: 何も開いていない` / `対象外(仕様書フォルダの md でない): <パス>` / `対象外(規則ノート自身): <パス>` / `対象外(削除された): <パス>` / `自動検査は切ってある。「検査し直す」かコマンドで検査する` / `規則ノートが読めないので、検査を1つもしていない`。最後の物は、上に理由が出ます(`規則ノートが見つからない: <パス>`・`json のブロックが無い`・`json のブロックが N 個ある(1個だけにする)`・`json のブロックが閉じていない`・`JSON が壊れている(…)`・`形が違う: <項目>`・`この端末では使えない規則(…): <項目>`)。
+検査をしなかったときは、理由が出ます: `規則ノートのパスが未設定。設定 → Spec Lint の「規則ノートのパス」で指定する`(下に `規則ノートが決まるまで、検査を1つもしない`。何を開いていても、これだけが出ます) / `対象外: 何も開いていない` / `対象外(仕様書フォルダの md でない): <パス>` / `対象外(規則ノート自身): <パス>` / `対象外(削除された): <パス>` / `自動検査は切ってある。「検査し直す」かコマンドで検査する` / `規則ノートが読めないので、検査を1つもしていない`。最後の物は、上に理由が出ます(`規則ノートが見つからない: <パス>`・`json のブロックが無い`・`json のブロックが N 個ある(1個だけにする)`・`json のブロックが閉じていない`・`JSON が壊れている(…)`・`形が違う: <項目>`・`この端末では使えない規則(…): <項目>`)。
 
 ## 設定
 | 項目 | 既定 | 内容 |
 |---|---|---|
-| 規則ノートのパス | `説明書/仕様書の書き方について/SpecLint規則.md`(作者の vault の物。書き換える) | vault からのパス。中の json のブロック1つが検査の規則のすべて |
+| 規則ノートのパス | 空(未設定) | vault からのパス(例: `Docs/SpecLint rules.md`)。中の json のブロック1つが検査の規則のすべて。未設定のあいだは検査を1つもしない。空に戻すと未設定に戻る(`/` だけを入れても未設定) |
 | 自動検査 | ON | 仕様書を開いたときと、仕様書か規則ノートが変わったときに検査する。切ると、ボタンかコマンドでだけ検査する |
 
 設定画面にあるのはこの 2 つだけです。ほかは全部、規則ノートに書きます。
@@ -160,9 +167,10 @@ vault のどこかに md を 1 本作り、中に json のブロックを **ち�
 - クリップボードには書きません。知らせ(Notice)も出しません。結果はパネルの中だけに出ます
 
 ## 動作確認の状況
-- 版 0.1.0。Windows の Obsidian 1.14.4 で動作を確認(規則ノートが無いと検査しないこと・置くと検査すること・指摘を押すとその行に移ること)
+- 版 0.1.1。Windows の Obsidian 1.14.4 で動作を確認(規則ノートが無いと検査しないこと・置くと検査すること・指摘を押すとその行に移ること)
 - iPhone・Android の実機は未確認(モバイル表示のエミュレーションで読み込みと表示まで確認)。絵文字の規則(`\p{…}` を使う正規表現)が実機で作れるかも未確認です。作れないと `この端末では使えない規則` と出て、検査をしません
 - 仕様書を直して保存したときに押さずに検査し直すこと、読み取りビューで開いているときの行への移動、検査にかかる時間は、まだ確かめていません
+- 「規則ノートのパス」が未設定のとき(0.1.1 で既定を空にした)にパネルに案内が出ることは、Obsidian の中でも確かめました。パネルを閉じた状態で「開いている仕様書を検査し直す」を使うとパネルが開くことは、まだ見ていません
 
 ## 分かっている限界
 - 検査するのは、開いている 1 本だけです。フォルダ全部をまとめて検査する機能はありません
@@ -188,7 +196,7 @@ MIT。[LICENSE](LICENSE) を見てください。
 
 ## English summary
 **Spec Lint** checks the open specification note against rules that you keep in a "rules note" in your vault, and lists the findings in a sidebar panel.
-- **Nothing is checked until you create the rules note**: a Markdown note with exactly one `json` code block. Every rule (target folders, required headings, ID prefixes, patterns) is read from it; set its path in settings.
+- **Nothing is checked until you create the rules note**: a Markdown note with exactly one `json` code block. Every rule (target folders, required headings, ID prefixes, patterns) is read from it. **The path is empty by default: set "規則ノートのパス" (rules note path, e.g. `Docs/SpecLint rules.md`) in settings first.** Until then the panel only tells you to set it; the plugin does not look for a rules note and checks nothing.
 - Structure checks: H1 pattern, required numbered H2 sections (presence, order, duplicates, wording), required H3s, required phrases, placeholders.
 - ID checks for IDs such as `FR-1`: duplicate definitions, gaps in numbering, references with no definition in the note, unknown prefixes. Emoji check with an allow list.
 - Findings are grouped as violations, cautions, and info; click one to move the cursor to that line. Checks that could not be decided (for example after an unclosed code block) are listed separately.

@@ -1,6 +1,6 @@
 {
 	"name": "spec-lint",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Check the open spec note against the rules in your rules note. Read-only.",
 	"main": "main.js",
 	"type": "module",

@@ -11,6 +11,7 @@ import { activeFile, folderPaths, readRulesNote, readSpec } from "./source";
 import { SpecLintView, VIEW_TYPE } from "./view";
 
 export type PanelState =
+	| { kind: "unset" }                                             // 規則ノートのパスが未設定(規則ノートを探さず、検査もしない)
 	| { kind: "none" }                                              // 何も開いていない
 	| { kind: "out"; path: string; reason: string }                 // 対象外(FR-1)
 	| { kind: "idle"; path: string }                                // 自動検査は切ってある(FR-21)
@@ -32,7 +33,7 @@ export default class SpecLintPlugin extends Plugin {
 		await this.loadSettings();
 		this.registerView(VIEW_TYPE, (leaf) => new SpecLintView(leaf, this));
 		this.addCommand({ id: "open-panel", name: "仕様書の検査パネルを開く", callback: () => void this.openPanel() });
-		this.addCommand({ id: "recheck", name: "開いている仕様書を検査し直す", callback: () => void this.check() });
+		this.addCommand({ id: "recheck", name: "開いている仕様書を検査し直す", callback: () => void this.recheck() });
 		this.addSettingTab(new SpecLintSettingTab(this.app, this));
 
 		this.registerEvent(this.app.workspace.on("file-open", () => this.onOpened()));
@@ -47,7 +48,7 @@ export default class SpecLintPlugin extends Plugin {
 	/** パネルが出している仕様書のパス */
 	shownPath(): string | null {
 		const s = this.state;
-		return s.kind === "none" ? null : s.kind === "done" ? s.result.path : s.path;
+		return s.kind === "none" || s.kind === "unset" ? null : s.kind === "done" ? s.result.path : s.path;
 	}
 
 	/** 自動検査が ON なら検査し、OFF なら対象かだけ決めて「自動検査は切ってある」にする */
@@ -95,9 +96,10 @@ export default class SpecLintPlugin extends Plugin {
 	}
 
 	private async checkOnce(run: boolean): Promise<PanelState> {
+		const rulesPath = this.settings.rulesNotePath;
+		if (rulesPath === "") return { kind: "unset" };
 		const file = activeFile(this.app);
 		if (!file) return { kind: "none" };
-		const rulesPath = this.settings.rulesNotePath;
 		const note = await readRulesNote(this.app, rulesPath);
 		if (note === null) return { kind: "rulesError", path: file.path, error: { reason: "規則ノートが見つからない", item: rulesPath } };
 		const rules = parseRules(note);
@@ -109,6 +111,12 @@ export default class SpecLintPlugin extends Plugin {
 		const text = await readSpec(this.app, file);
 		const result = runChecks({ path: file.path, text, folders: folderPaths(this.app) }, rules);
 		return { kind: "done", result, at: new Date(), rulesUpdated: rules.updated, slotSection: rules.placeholderSection };
+	}
+
+	/** コマンドから。未設定のときは、パネルを出して知らせを見せる(結果はパネルにだけ出す。INV-12) */
+	private async recheck(): Promise<void> {
+		await this.check();
+		if (this.state.kind === "unset") await this.openPanel();
 	}
 
 	private setState(s: PanelState): void {

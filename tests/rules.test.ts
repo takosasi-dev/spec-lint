@@ -1,7 +1,7 @@
 // 規則ノートの読み込みと検証(FR-2・§10・AC-8 の純関数の部分)と、設定の補い(§9.3)のテスト。
 import { describe, expect, it } from "vitest";
 import { isRulesError, parseRules, type RulesJson } from "../src/rules/validate";
-import { DEFAULTS, normalizeSettings } from "../src/settings";
+import { cleanRulesPath, DEFAULTS, normalizeSettings } from "../src/settings";
 import { FIXTURE, note } from "./helpers";
 
 const withJson = (patch: (j: RulesJson & Record<string, unknown>) => void) => {
@@ -58,6 +58,16 @@ describe("§9.3 設定", () => {
 		expect(normalizeSettings(null, norm)).toEqual({ settings: DEFAULTS, problem: false });
 		expect(normalizeSettings({ autoCheck: false }, norm)).toEqual({ settings: { ...DEFAULTS, autoCheck: false }, problem: false });
 		expect(normalizeSettings({ rulesNotePath: "a\\b.md" }, norm).settings.rulesNotePath).toBe("a/b.md");
+	});
+	it("規則ノートのパスは既定では空(未設定)。保存してある値はそのまま生き、空・空白だけ・/ は未設定になる", () => {
+		const obsidianNorm = (p: string) => norm(p).replace(/^\/+|\/+$/g, "") || "/";   // normalizePath("") は "/" を返す
+		expect(DEFAULTS.rulesNotePath).toBe("");
+		expect(normalizeSettings({ rulesNotePath: "Docs/SpecLint rules.md" }, obsidianNorm).settings.rulesNotePath).toBe("Docs/SpecLint rules.md");
+		for (const unset of ["", "  ", "/"]) {
+			expect(cleanRulesPath(unset, obsidianNorm)).toBe("");
+			expect(normalizeSettings({ rulesNotePath: unset }, obsidianNorm).settings.rulesNotePath).toBe("");
+		}
+		expect(cleanRulesPath(" Docs\\rules.md ", obsidianNorm)).toBe("Docs/rules.md");
 	});
 	it("壊れている・schemaVersion が違うときは既定値と problem", () => {
 		expect(normalizeSettings("x", norm)).toEqual({ settings: DEFAULTS, problem: true });

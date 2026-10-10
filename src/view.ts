@@ -53,6 +53,10 @@ export class SpecLintView extends ItemView {
 		const rulesPath = p.settings.rulesNotePath;
 		const s = p.state;
 		switch (s.kind) {
+			case "unset":
+				root.createDiv({ cls: "sl-warn", text: "規則ノートのパスが未設定。設定 → Spec Lint の「規則ノートのパス」で指定する" });
+				root.createDiv({ cls: "sl-note", text: "規則ノートが決まるまで、検査を1つもしない" });
+				return;
 			case "none":
 				root.createDiv({ cls: "sl-line", text: "対象外: 何も開いていない" });
 				return;
