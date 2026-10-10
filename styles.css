@@ -1,0 +1,13 @@
+/* Spec Lint のパネル(§9.5)。色は Obsidian のテーマの変数だけを使う。 */
+.sl-panel { font-size: var(--font-ui-small); }
+.sl-panel > button { margin-bottom: var(--size-4-2); }
+.sl-line { overflow-wrap: anywhere; }
+.sl-totals { font-weight: var(--font-semibold); margin-bottom: var(--size-4-1); }
+.sl-note { color: var(--text-muted); }
+.sl-warn { color: var(--text-error); overflow-wrap: anywhere; }
+.sl-group > summary { font-weight: var(--font-semibold); cursor: pointer; padding: var(--size-4-1) 0; }
+.sl-row { padding: 2px 0 2px var(--size-4-3); overflow-wrap: anywhere; }
+.sl-kind { color: var(--text-muted); margin-right: var(--size-4-2); }
+.sl-lineno { color: var(--text-muted); margin-left: var(--size-4-2); white-space: nowrap; }
+.sl-link { cursor: pointer; }
+.sl-link:hover, .sl-link:focus-visible { color: var(--text-accent); }

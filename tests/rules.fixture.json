@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "updated": "2026-09-26",
+  "targets": { "specFolders": ["仕様書MDファイル"], "excludePaths": [] },
+  "checks": { "contract": true, "emoji": true, "ids": true, "unknownPrefix": true },
+  "ids": {
+    "prefixes": ["FR", "INV", "AC", "D", "R", "Q", "E", "NFR"],
+    "definePatterns": [
+      "^\\|\\s*(?:~~)?([A-Z]+)-(\\d+)([a-z]?)(?:~~)?\\s*\\|",
+      "^\\s*-\\s\\[[ xX]\\]\\s*([A-Z]+)-(\\d+)([a-z]?)"
+    ],
+    "gapMinDefinitions": 3,
+    "productNameIgnore": ["Windows", "Android", "iOS", "Web・ブラウザ", "複数OS", "OS非依存"]
+  },
+  "contract": {
+    "detectHeading": "0. Claude Codeへの指示",
+    "excludePaths": [],
+    "title": "^# .+ — 実装仕様書 v\\d+$",
+    "headings": ["0. Claude Codeへの指示", "1. 目的", "2. アーキテクチャ", "3. スコープ / 非スコープ",
+      "4. 前提(誤っていれば私に指摘すること)", "5. 決定事項と理由", "6. 機能要件", "7. 逸脱不可要件",
+      "8.", "9. インタフェース定義", "10. エッジケースとエラー", "11. 受け入れ基準", "12. 実装フェーズ",
+      "13. 未確定事項(実装前に確認が必要)"],
+    "subheadings": { "3": ["スコープ", "非スコープ"], "5": ["撤退基準"] },
+    "retreat": { "section": 5, "subheading": "撤退基準", "prefix": "R" },
+    "zeroPhrases": [
+      { "name": "フェーズごとに停止", "any": ["フェーズごとに停止"] },
+      { "name": "仕様に無いことは実装しない", "any": ["仕様に書かれていないことは実装しない"] },
+      { "name": "推測でコードを書かない", "any": ["推測でコードを書かない"] },
+      { "name": "冒頭に責務を3行以内", "any": ["3行以内"] } ],
+    "section8MentionIn": [0, 12], "section8Mention": "§8",
+    "tentativeName": { "section": 13, "word": "仮称" },
+    "placeholder": "\\{\\{.*?\\}\\}",
+    "priority": { "prefix": "FR", "words": ["必須", "推奨", "任意"] },
+    "emoji": { "pattern": "\\p{Emoji_Presentation}|\\p{Extended_Pictographic}\\uFE0F", "allow": [] }
+  }
+}
